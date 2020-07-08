@@ -14,6 +14,9 @@ public class User {
 	private String email;
 	private String password;
 
+	public User() {}
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -14,6 +14,8 @@ public class Course {
 	private String name;
 	private String category;
 
+	public Course() {}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

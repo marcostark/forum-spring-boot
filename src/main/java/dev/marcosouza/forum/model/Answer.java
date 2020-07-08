@@ -19,6 +19,8 @@ public class Answer {
 	private User author;
 	private Boolean solution = false;
 
+	public Answer() {}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

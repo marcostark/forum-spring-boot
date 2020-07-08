@@ -27,12 +27,21 @@ public class Topic {
 	@OneToMany(mappedBy = "topic")
 	private List<Answer> answers = new ArrayList<>();
 
+	public Topic() {}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
+	}
+
+	public Topic(String title, String message, Course course) {
+		super();
+		this.title = title;
+		this.message = message;
+		this.course = course;
 	}
 
 	@Override
