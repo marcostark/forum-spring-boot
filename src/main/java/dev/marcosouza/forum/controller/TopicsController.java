@@ -1,16 +1,20 @@
 package dev.marcosouza.forum.controller;
 
+import dev.marcosouza.forum.controller.dto.TopicDetailsDto;
 import dev.marcosouza.forum.controller.dto.TopicDto;
 import dev.marcosouza.forum.controller.form.TopicForm;
+import dev.marcosouza.forum.controller.form.TopicFormUpdate;
 import dev.marcosouza.forum.model.Topic;
 import dev.marcosouza.forum.repository.TopicRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/topics")
@@ -49,4 +53,19 @@ public class TopicsController {
         return ResponseEntity.created(uri).body(new TopicDto(topic));
     }
 
+    @GetMapping("/{id}")
+    public TopicDetailsDto getTopic(@PathVariable Long id) {
+        Topic topic = this.topicRepository.getOne(id);
+        return new TopicDetailsDto(topic);
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<TopicDto> update(
+            @PathVariable Long id,
+            @RequestBody @Valid TopicFormUpdate topicFormUpdate) {
+        Topic topic = topicFormUpdate.update(id, topicRepository);
+
+        return ResponseEntity.ok(new TopicDto(topic));
+    }
 }
