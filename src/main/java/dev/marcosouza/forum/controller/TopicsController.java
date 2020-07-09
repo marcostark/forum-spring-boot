@@ -6,8 +6,9 @@ import dev.marcosouza.forum.controller.form.TopicForm;
 import dev.marcosouza.forum.controller.form.TopicFormUpdate;
 import dev.marcosouza.forum.model.Topic;
 import dev.marcosouza.forum.repository.TopicRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -18,7 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -37,6 +37,7 @@ public class TopicsController {
     }
 
     @GetMapping
+    @Cacheable(value = "listTopics")
     public Page<TopicDto> getTopics(
             @RequestParam(required = false) String courseName,
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC, size = 10, page = 0) Pageable pageable) {
@@ -55,6 +56,7 @@ public class TopicsController {
     }
 
     @PostMapping
+    @CacheEvict(value = "listTopics", allEntries = true)
     public ResponseEntity<TopicDto> create(
             @RequestBody
             @Valid TopicForm topicForm,
@@ -66,6 +68,7 @@ public class TopicsController {
     }
 
     @GetMapping("/{id}")
+    @CacheEvict(value = "listTopics", allEntries = true)
     public ResponseEntity<TopicDetailsDto> getTopic(@PathVariable Long id) {
         Optional<Topic> topic = this.topicRepository.findById(id);
         if(topic.isPresent()) {
@@ -76,6 +79,7 @@ public class TopicsController {
 
     @PutMapping("/{id}")
     @Transactional
+    @CacheEvict(value = "listTopics", allEntries = true)
     public ResponseEntity<TopicDto> update(
             @PathVariable Long id,
             @RequestBody @Valid TopicFormUpdate topicFormUpdate) {
@@ -89,6 +93,7 @@ public class TopicsController {
     }
 
     @DeleteMapping("/{id}")
+    @CacheEvict(value = "listTopics", allEntries = true)
     public ResponseEntity<TopicDto> delete(@PathVariable Long id) {
         Optional<Topic> optionalTopic = this.topicRepository.findById(id);
         if(optionalTopic.isPresent()) {
