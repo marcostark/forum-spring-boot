@@ -1,6 +1,7 @@
 package dev.marcosouza.forum.controller.dto;
 
 import dev.marcosouza.forum.model.Topic;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,7 +37,7 @@ public class TopicDto {
         return createDate;
     }
 
-    public static List<TopicDto> converter(List<Topic> topics) {
-        return topics.stream().map(TopicDto::new).collect(Collectors.toList());
+    public static Page<TopicDto> converter(Page<Topic> topics) {
+        return topics.map(TopicDto::new);
     }
 }
