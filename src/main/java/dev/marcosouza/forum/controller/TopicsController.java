@@ -54,9 +54,12 @@ public class TopicsController {
     }
 
     @GetMapping("/{id}")
-    public TopicDetailsDto getTopic(@PathVariable Long id) {
-        Topic topic = this.topicRepository.getOne(id);
-        return new TopicDetailsDto(topic);
+    public ResponseEntity<TopicDetailsDto> getTopic(@PathVariable Long id) {
+        Optional<Topic> topic = this.topicRepository.findById(id);
+        if(topic.isPresent()) {
+            return ResponseEntity.ok(new TopicDetailsDto(topic.get()));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
@@ -64,8 +67,22 @@ public class TopicsController {
     public ResponseEntity<TopicDto> update(
             @PathVariable Long id,
             @RequestBody @Valid TopicFormUpdate topicFormUpdate) {
-        Topic topic = topicFormUpdate.update(id, topicRepository);
 
-        return ResponseEntity.ok(new TopicDto(topic));
+        Optional<Topic> optionalTopic = this.topicRepository.findById(id);
+        if(optionalTopic.isPresent()) {
+            Topic topic = topicFormUpdate.update(id, topicRepository);
+            return ResponseEntity.ok(new TopicDto(topic));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TopicDto> delete(@PathVariable Long id) {
+        Optional<Topic> optionalTopic = this.topicRepository.findById(id);
+        if(optionalTopic.isPresent()) {
+            topicRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
