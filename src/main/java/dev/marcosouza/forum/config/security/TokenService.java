@@ -1,6 +1,7 @@
 package dev.marcosouza.forum.config.security;
 
 import dev.marcosouza.forum.model.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,5 +39,16 @@ public class TokenService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Recuperar o id do usuário a partir do token
+     * @param token
+     * @return Id do usuário
+     */
+    public Long getUserId(String token) {
+        Claims claims = Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).getBody();
+        return Long.parseLong(claims.getSubject()); // id do usuario
+
     }
 }

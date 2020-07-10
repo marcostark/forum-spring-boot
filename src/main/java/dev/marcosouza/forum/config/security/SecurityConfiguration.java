@@ -1,5 +1,6 @@
 package dev.marcosouza.forum.config.security;
 
+import dev.marcosouza.forum.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,15 +25,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     final
     TokenService tokenService;
 
+    final
+    UserRepository userRepository;
+
     @Override
     @Bean
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }
 
-    public SecurityConfiguration(AuthenticationService authenticationService, TokenService tokenService) {
+    public SecurityConfiguration(AuthenticationService authenticationService, TokenService tokenService, UserRepository userRepository) {
         this.authenticationService = authenticationService;
         this.tokenService = tokenService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -50,7 +55,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(new AuthenticationTokenFilter(tokenService), UsernamePasswordAuthenticationFilter.class); // Não criar sessão, utiliza token.
+                .and().addFilterBefore(new AuthenticationTokenFilter(tokenService, userRepository), UsernamePasswordAuthenticationFilter.class); // Não criar sessão, utiliza token.
     }
 
     /**
