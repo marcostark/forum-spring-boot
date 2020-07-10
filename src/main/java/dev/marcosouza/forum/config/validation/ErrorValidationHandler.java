@@ -16,9 +16,18 @@ import java.util.List;
 @RestControllerAdvice
 public class ErrorValidationHandler {
 
-    @Autowired
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
+    public ErrorValidationHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    /**
+     * Metodo para retornar exceções personalizadas para erros de validação
+     * de forms.
+     * @param exception
+     * @return
+     */
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public List<FormErrorDto> handle(MethodArgumentNotValidException exception) {
