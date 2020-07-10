@@ -1,5 +1,6 @@
 package dev.marcosouza.forum.config.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -19,14 +21,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     final
     AuthenticationService authenticationService;
 
+    final
+    TokenService tokenService;
+
     @Override
     @Bean
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }
 
-    public SecurityConfiguration(AuthenticationService authenticationService) {
+    public SecurityConfiguration(AuthenticationService authenticationService, TokenService tokenService) {
         this.authenticationService = authenticationService;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -43,7 +49,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // Não criar sessão, utiliza token.
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().addFilterBefore(new AuthenticationTokenFilter(tokenService), UsernamePasswordAuthenticationFilter.class); // Não criar sessão, utiliza token.
     }
 
     /**
