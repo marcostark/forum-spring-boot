@@ -9,3 +9,5 @@
     - Preferível utilizar em informações que demoram muito ou raramente são atualizadas no banco de dados
 - Spring Security
 - JWT (Json Web Token)
+- Monitoramento com Spring Boot Actuator
+- SpringFox Swagger para documentação da API
