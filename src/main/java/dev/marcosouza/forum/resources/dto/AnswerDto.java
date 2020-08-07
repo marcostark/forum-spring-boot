@@ -1,4 +1,4 @@
-package dev.marcosouza.forum.controller.dto;
+package dev.marcosouza.forum.resources.dto;
 
 import dev.marcosouza.forum.model.Answer;
 

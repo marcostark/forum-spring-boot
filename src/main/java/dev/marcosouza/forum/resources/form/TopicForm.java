@@ -1,6 +1,6 @@
-package dev.marcosouza.forum.controller.form;
+package dev.marcosouza.forum.resources.form;
 
-import dev.marcosouza.forum.controller.CourseRepository;
+import dev.marcosouza.forum.repository.CourseRepository;
 import dev.marcosouza.forum.model.Course;
 import dev.marcosouza.forum.model.Topic;
 import org.hibernate.validator.constraints.Length;
