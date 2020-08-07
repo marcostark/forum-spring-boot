@@ -1,6 +1,5 @@
-package dev.marcosouza.forum.controller.dto;
+package dev.marcosouza.forum.resources.dto;
 
-import dev.marcosouza.forum.model.Answer;
 import dev.marcosouza.forum.model.Topic;
 import dev.marcosouza.forum.model.TopicStatus;
 

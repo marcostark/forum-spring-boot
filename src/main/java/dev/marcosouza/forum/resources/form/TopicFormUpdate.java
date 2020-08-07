@@ -1,4 +1,4 @@
-package dev.marcosouza.forum.controller.form;
+package dev.marcosouza.forum.resources.form;
 
 import dev.marcosouza.forum.model.Topic;
 import dev.marcosouza.forum.repository.TopicRepository;

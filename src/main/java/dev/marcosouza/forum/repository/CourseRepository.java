@@ -1,4 +1,4 @@
-package dev.marcosouza.forum.controller;
+package dev.marcosouza.forum.repository;
 
 import dev.marcosouza.forum.model.Course;
 import org.springframework.data.jpa.repository.JpaRepository;

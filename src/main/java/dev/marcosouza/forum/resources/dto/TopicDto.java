@@ -1,11 +1,9 @@
-package dev.marcosouza.forum.controller.dto;
+package dev.marcosouza.forum.resources.dto;
 
 import dev.marcosouza.forum.model.Topic;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class TopicDto {
 

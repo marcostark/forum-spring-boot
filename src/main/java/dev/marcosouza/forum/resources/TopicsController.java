@@ -1,11 +1,14 @@
-package dev.marcosouza.forum.controller;
+package dev.marcosouza.forum.resources;
 
-import dev.marcosouza.forum.controller.dto.TopicDetailsDto;
-import dev.marcosouza.forum.controller.dto.TopicDto;
-import dev.marcosouza.forum.controller.form.TopicForm;
-import dev.marcosouza.forum.controller.form.TopicFormUpdate;
+import dev.marcosouza.forum.resources.dto.TopicDetailsDto;
+import dev.marcosouza.forum.resources.dto.TopicDto;
+import dev.marcosouza.forum.resources.form.TopicForm;
+import dev.marcosouza.forum.resources.form.TopicFormUpdate;
 import dev.marcosouza.forum.model.Topic;
+import dev.marcosouza.forum.repository.CourseRepository;
 import dev.marcosouza.forum.repository.TopicRepository;
+import dev.marcosouza.forum.service.TopicService;
+import dev.marcosouza.forum.service.impl.TopicServiceImpl;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -19,7 +22,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/topics")
@@ -29,11 +31,15 @@ public class TopicsController {
 
     private final CourseRepository courseRepository;
 
+    public final TopicService topicService;
+
     public TopicsController(
             TopicRepository topicRepository,
-            CourseRepository courseRepository) {
+            CourseRepository courseRepository,
+            TopicServiceImpl topicService) {
         this.topicRepository = topicRepository;
         this.courseRepository = courseRepository;
+        this.topicService = topicService;
     }
 
     @GetMapping
@@ -41,18 +47,7 @@ public class TopicsController {
     public Page<TopicDto> getTopics(
             @RequestParam(required = false) String courseName,
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC, size = 10, page = 0) Pageable pageable) {
-
-        // Forma "manual"
-        //Pageable page = PageRequest.of(size, per_page)
-
-        if (courseName == null) {
-            Page<Topic> topics = topicRepository.findAll(pageable);
-            return TopicDto.converter(topics);
-
-        } else {
-            Page<Topic> topics = topicRepository.findByCourseName(courseName, pageable);
-            return TopicDto.converter(topics);
-        }
+        return this.topicService.getTopics(courseName, pageable);
     }
 
     @PostMapping
@@ -61,8 +56,7 @@ public class TopicsController {
             @RequestBody
             @Valid TopicForm topicForm,
             UriComponentsBuilder uriComponentsBuilder) {
-        Topic topic = topicForm.converter(courseRepository);
-        this.topicRepository.save(topic);
+        Topic topic = this.topicService.createTopic(topicForm);
         URI uri = uriComponentsBuilder.path("/topics/{id}").buildAndExpand(topic.getId()).toUri();
         return ResponseEntity.created(uri).body(new TopicDto(topic));
     }
@@ -70,9 +64,9 @@ public class TopicsController {
     @GetMapping("/{id}")
     @CacheEvict(value = "listTopics", allEntries = true)
     public ResponseEntity<TopicDetailsDto> getTopic(@PathVariable Long id) {
-        Optional<Topic> topic = this.topicRepository.findById(id);
-        if(topic.isPresent()) {
-            return ResponseEntity.ok(new TopicDetailsDto(topic.get()));
+        TopicDetailsDto topic = this.topicService.getTopic(id);
+        if(topic != null){
+            return ResponseEntity.ok(topic);
         }
         return ResponseEntity.notFound().build();
     }
@@ -83,10 +77,8 @@ public class TopicsController {
     public ResponseEntity<TopicDto> update(
             @PathVariable Long id,
             @RequestBody @Valid TopicFormUpdate topicFormUpdate) {
-
-        Optional<Topic> optionalTopic = this.topicRepository.findById(id);
-        if(optionalTopic.isPresent()) {
-            Topic topic = topicFormUpdate.update(id, topicRepository);
+        Topic topic = this.topicService.updateTopic(id, topicFormUpdate);
+        if(topic != null) {
             return ResponseEntity.ok(new TopicDto(topic));
         }
         return ResponseEntity.notFound().build();
@@ -95,9 +87,8 @@ public class TopicsController {
     @DeleteMapping("/{id}")
     @CacheEvict(value = "listTopics", allEntries = true)
     public ResponseEntity<TopicDto> delete(@PathVariable Long id) {
-        Optional<Topic> optionalTopic = this.topicRepository.findById(id);
-        if(optionalTopic.isPresent()) {
-            topicRepository.deleteById(id);
+        Topic topic = this.topicService.deleteTopic(id);
+        if(topic != null) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
